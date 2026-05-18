@@ -36,7 +36,7 @@ export default function Settings() {
     <>
       <TopBar>
         <div>
-          <h1 className="text-lg">Settings</h1>
+          <h1 className="text-lg">设置</h1>
         </div>
         <div className="flex-1"></div>
       </TopBar>
@@ -117,7 +117,7 @@ export default function Settings() {
             disabled={status === 'saving'}
             className="w-full px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {status === 'saving' ? 'Saving...' : 'Save Settings'}
+            {status === 'saving' ? '保存中...' : 'Save Settings'}
           </button>
 
           {status === 'success' && <p className="text-green-500 text-center">Settings saved successfully!</p>}

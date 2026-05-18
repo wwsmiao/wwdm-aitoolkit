@@ -97,7 +97,7 @@ export default function JobOverview({ job }: JobOverviewProps) {
           {/* Progress Bar */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-gray-400">Progress</span>
+              <span className="text-gray-400">进度</span>
               <span className="text-gray-200">
                 Step {job.step} of {totalSteps}
               </span>

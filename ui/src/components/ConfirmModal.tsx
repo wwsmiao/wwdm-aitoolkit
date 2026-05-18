@@ -182,7 +182,7 @@ export default function ConfirmModal() {
                 onClick={onConfirm}
                 className={`inline-flex w-full justify-center rounded-md ${getButtonBgColor()} px-3 py-2 text-sm font-semibold text-white shadow-xs sm:ml-3 sm:w-auto`}
               >
-                {confirm?.confirmText || 'Confirm'}
+                {confirm?.confirmText || '确认'}
               </button>
               <button
                 type="button"

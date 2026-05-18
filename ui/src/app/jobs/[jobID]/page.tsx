@@ -24,7 +24,7 @@ interface Page {
 
 const pages: Page[] = [
   {
-    name: 'Overview',
+    name: '概览',
     value: 'overview',
     component: JobOverview,
     mainCss: 'pt-24',
@@ -37,7 +37,7 @@ const pages: Page[] = [
     mainCss: 'pt-24',
   },
   {
-    name: 'Config File',
+    name: '配置文件',
     value: 'config',
     component: JobConfigViewer,
     mainCss: 'pt-[80px] px-0 pb-0',
@@ -78,7 +78,7 @@ export default function JobPage({ params }: { params: { jobID: string } }) {
         )}
       </TopBar>
       <MainContent className={pages.find(page => page.value === pageKey)?.mainCss}>
-        {status === 'loading' && job == null && <p>Loading...</p>}
+        {status === 'loading' && job == null && <p>加载中...</p>}
         {status === 'error' && job == null && <p>Error fetching job</p>}
         {job && (
           <>

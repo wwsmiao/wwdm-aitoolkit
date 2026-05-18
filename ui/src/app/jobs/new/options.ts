@@ -499,7 +499,7 @@ export const modelArchs: ModelArch[] = [
   },
   {
     name: 'zimage:turbo',
-    label: 'Z-Image Turbo (w/ Training Adapter)',
+    label: 'Z-Image Turbo (含训练适配器)',
     group: 'image',
     defaults: {
       // default updates when [selected, unselected] in the UI
@@ -527,13 +527,23 @@ export const modelArchs: ModelArch[] = [
   return a.label.localeCompare(b.label, undefined, { sensitivity: 'base' });
 }) as any;
 
+// Translations map for groups
+const groupTranslations: { [key: string]: string } = {
+  'image': '图像模型 (Image)',
+  'video': '视频模型 (Video)',
+  'instruction': '指令编辑 (Instruction)'
+};
+
 export const groupedModelOptions: GroupedSelectOption[] = modelArchs.reduce((acc, arch) => {
-  const group = acc.find(g => g.label === arch.group);
+  // Translate the group label
+  const groupLabel = groupTranslations[arch.group] || arch.group;
+  
+  const group = acc.find(g => g.label === groupLabel);
   if (group) {
     group.options.push({ value: arch.name, label: arch.label });
   } else {
     acc.push({
-      label: arch.group,
+      label: groupLabel,
       options: [{ value: arch.name, label: arch.label }],
     });
   }
@@ -541,14 +551,14 @@ export const groupedModelOptions: GroupedSelectOption[] = modelArchs.reduce((acc
 }, [] as GroupedSelectOption[]);
 
 export const quantizationOptions: SelectOption[] = [
-  { value: '', label: '- NONE -' },
-  { value: 'qfloat8', label: 'float8 (default)' },
-  { value: 'uint7', label: '7 bit' },
-  { value: 'uint6', label: '6 bit' },
-  { value: 'uint5', label: '5 bit' },
-  { value: 'uint4', label: '4 bit' },
-  { value: 'uint3', label: '3 bit' },
-  { value: 'uint2', label: '2 bit' },
+  { value: '', label: '- 无 (NONE) -' },
+  { value: 'qfloat8', label: 'float8 (默认)' },
+  { value: 'uint7', label: '7 bit (7位)' },
+  { value: 'uint6', label: '6 bit (6位)' },
+  { value: 'uint5', label: '5 bit (5位)' },
+  { value: 'uint4', label: '4 bit (4位)' },
+  { value: 'uint3', label: '3 bit (3位)' },
+  { value: 'uint2', label: '2 bit (2位)' },
 ];
 
 export const defaultQtype = 'qfloat8';
@@ -563,12 +573,12 @@ interface JobTypeOption extends SelectOption {
 export const jobTypeOptions: JobTypeOption[] = [
   {
     value: 'diffusion_trainer',
-    label: 'LoRA Trainer',
+    label: 'LoRA 训练器 (Trainer)',
     disableSections: ['slider'],
   },
   {
     value: 'concept_slider',
-    label: 'Concept Slider',
+    label: '概念滑块 (Concept Slider)',
     disableSections: ['trigger_word', 'train.diff_output_preservation'],
     onActivate: (config: JobConfig) => {
       // add default slider config

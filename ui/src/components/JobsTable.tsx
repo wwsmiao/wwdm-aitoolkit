@@ -28,7 +28,7 @@ export default function JobsTable({ onlyActive = false }: JobsTableProps) {
 
   const columns: TableColumn[] = [
     {
-      title: 'Name',
+      title: '名称',
       key: 'name',
       render: row => (
         <Link href={`/jobs/${row.id}`} className="font-medium whitespace-nowrap">
@@ -66,7 +66,7 @@ export default function JobsTable({ onlyActive = false }: JobsTableProps) {
       key: 'gpu_ids',
     },
     {
-      title: 'Status',
+      title: '状态',
       key: 'status',
       render: row => {
         let statusClass = 'text-gray-400';
@@ -83,7 +83,7 @@ export default function JobsTable({ onlyActive = false }: JobsTableProps) {
       className: 'truncate max-w-xs',
     },
     {
-      title: 'Actions',
+      title: '操作',
       key: 'actions',
       className: 'text-right',
       render: row => {

@@ -57,7 +57,7 @@ export const SampleImagesMenu = ({ job }: SampleImagesMenuProps) => {
       ) : (
         <FaDownload className="inline-block mr-2" />
       )}
-      {isZipping ? 'Preparing' : 'Download'}
+      {isZipping ? '准备中' : '下载'}
     </Button>
   );
 };
@@ -125,8 +125,8 @@ export default function SampleImages({ job }: SampleImagesProps) {
     }
     if (status == 'success' && sampleImages.length === 0) {
       icon = <LuImageOff className="w-8 h-8" />;
-      text = 'No Samples Found';
-      subtitle = 'No samples have been generated yet';
+      text = '暂无示例图片';
+      subtitle = '尚未生成示例图片';
       showIt = true;
       bgColor = 'bg-gray-50 dark:bg-gray-800/50';
       textColor = 'text-gray-900 dark:text-gray-100';

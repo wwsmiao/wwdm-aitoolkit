@@ -4,7 +4,7 @@ import { IoFlaskSharp } from 'react-icons/io5';
 
 const docs: { [key: string]: ConfigDoc } = {
   'config.name': {
-    title: 'Training Name',
+    title: '训练名称',
     description: (
       <>
         The name of the training job. This name will be used to identify the job in the system and will the the filename
@@ -23,7 +23,7 @@ const docs: { [key: string]: ConfigDoc } = {
     ),
   },
   'config.process[0].trigger_word': {
-    title: 'Trigger Word',
+    title: '触发词',
     description: (
       <>
         Optional: This will be the word or token used to trigger your concept or character.

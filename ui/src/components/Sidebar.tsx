@@ -1,14 +1,16 @@
 import Link from 'next/link';
-import { Home, Settings, BrainCircuit, Images, Plus } from 'lucide-react';
+import {  Home, Settings, BrainCircuit, Images, Plus , ImageDown, Tags } from 'lucide-react';
 import { FaXTwitter, FaDiscord, FaYoutube } from 'react-icons/fa6';
 
 const Sidebar = () => {
   const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'New Job', href: '/jobs/new', icon: Plus },
-    { name: 'Training Queue', href: '/jobs', icon: BrainCircuit },
-    { name: 'Datasets', href: '/datasets', icon: Images },
-    { name: 'Settings', href: '/settings', icon: Settings },
+    { name: '仪表盘', href: '/dashboard', icon: Home },
+    { name: '新建任务', href: '/jobs/new', icon: Plus },
+    { name: '训练队列', href: '/jobs', icon: BrainCircuit },
+    { name: '数据集', href: '/datasets', icon: Images },
+    { name: '图片处理', href: '/image-batch', icon: ImageDown },
+    { name: 'Ollama打标', href: '/ollama-tagging', icon: Tags },
+    { name: '设置', href: '/settings', icon: Settings },
   ];
 
   const socialsBoxClass =

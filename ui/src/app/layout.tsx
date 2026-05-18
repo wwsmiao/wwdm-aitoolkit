@@ -13,8 +13,8 @@ export const dynamic = 'force-dynamic';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Ostris - AI Toolkit',
-  description: 'A toolkit for building AI things.',
+  title: 'Ostris - AI 工具集',
+  description: 'AI 工具集，专为 AI 开发而设计。',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

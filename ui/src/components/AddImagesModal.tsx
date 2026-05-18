@@ -117,7 +117,7 @@ export default function AddImagesModal() {
                       <div className="w-full bg-gray-700 rounded-full h-2.5">
                         <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${uploadProgress}%` }}></div>
                       </div>
-                      <p className="text-sm text-gray-300 mt-2 text-center">Uploading... {uploadProgress}%</p>
+                      <p className="text-sm text-gray-300 mt-2 text-center">上传中... {uploadProgress}%</p>
                     </div>
                   )}
                 </div>

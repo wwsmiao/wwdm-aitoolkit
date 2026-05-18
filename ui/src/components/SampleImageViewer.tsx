@@ -263,7 +263,7 @@ export default function SampleImageViewer({
                           title: 'Delete Sample',
                           message: message,
                           type: 'warning',
-                          confirmText: 'Delete',
+                          confirmText: '删除',
                           onConfirm: () => {
                             apiClient
                               .post('/api/img/delete', { imgPath: imgPath })

@@ -51,8 +51,8 @@ export default function DatasetPage({ params }: { params: { datasetName: string 
 
     if (status == 'loading') {
       icon = <LuLoader className="animate-spin w-8 h-8" />;
-      text = 'Loading Images';
-      subtitle = 'Please wait while we fetch your dataset images...';
+      text = '加载图片中';
+      subtitle = '正在获取数据集图片，请稍候...';
       showIt = true;
       bgColor = 'bg-gray-50 dark:bg-gray-800/50';
       textColor = 'text-gray-900 dark:text-gray-100';
@@ -60,8 +60,8 @@ export default function DatasetPage({ params }: { params: { datasetName: string 
     }
     if (status == 'error') {
       icon = <LuBan className="w-8 h-8" />;
-      text = 'Error Loading Images';
-      subtitle = 'There was a problem fetching the images. Please try refreshing the page.';
+      text = '图片加载失败';
+      subtitle = '获取图片时出错，请尝试刷新页面。';
       showIt = true;
       bgColor = 'bg-red-50 dark:bg-red-950/20';
       textColor = 'text-red-900 dark:text-red-100';
@@ -69,8 +69,8 @@ export default function DatasetPage({ params }: { params: { datasetName: string 
     }
     if (status == 'success' && imgList.length === 0) {
       icon = <LuImageOff className="w-8 h-8" />;
-      text = 'No Images Found';
-      subtitle = 'This dataset is empty. Click "Add Images" to get started.';
+      text = '暂无图片';
+      subtitle = '该数据集为空，点击"添加图片"开始添加。';
       showIt = true;
       bgColor = 'bg-gray-50 dark:bg-gray-800/50';
       textColor = 'text-gray-900 dark:text-gray-100';

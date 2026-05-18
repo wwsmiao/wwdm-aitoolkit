@@ -27,7 +27,7 @@ export default function Datasets() {
 
   const columns: TableColumn[] = [
     {
-      title: 'Dataset Name',
+      title: '数据集名称',
       key: 'name',
       render: row => (
         <Link href={`/datasets/${row.name}`} className="text-gray-200 hover:text-gray-100">
@@ -36,7 +36,7 @@ export default function Datasets() {
       ),
     },
     {
-      title: 'Actions',
+      title: '操作',
       key: 'actions',
       className: 'w-20 text-right',
       render: row => (
@@ -55,7 +55,7 @@ export default function Datasets() {
       title: 'Delete Dataset',
       message: `Are you sure you want to delete the dataset "${datasetName}"? This action cannot be undone.`,
       type: 'warning',
-      confirmText: 'Delete',
+      confirmText: '删除',
       onConfirm: () => {
         apiClient
           .post('/api/datasets/delete', { name: datasetName })
@@ -85,11 +85,11 @@ export default function Datasets() {
 
   const openNewDatasetModal = () => {
     openConfirm({
-      title: 'New Dataset',
+      title: '新建数据集',
       message: 'Enter the name of the new dataset:',
       type: 'info',
       confirmText: 'Create',
-      inputTitle: 'Dataset Name',
+      inputTitle: '数据集名称',
       onConfirm: async (name?: string) => {
         if (!name) {
           console.error('Dataset name is required.');
@@ -114,7 +114,7 @@ export default function Datasets() {
     <>
       <TopBar>
         <div>
-          <h1 className="text-2xl font-semibold text-gray-100">Datasets</h1>
+          <h1 className="text-2xl font-semibold text-gray-100">数据集</h1>
         </div>
         <div className="flex-1"></div>
         <div>
@@ -139,7 +139,7 @@ export default function Datasets() {
       <Modal
         isOpen={isNewDatasetModalOpen}
         onClose={() => setIsNewDatasetModalOpen(false)}
-        title="New Dataset"
+        title="新建数据集"
         size="md"
       >
         <div className="space-y-4 text-gray-200">
@@ -148,7 +148,7 @@ export default function Datasets() {
               This will create a new folder with the name below in your dataset folder.
             </div>
             <div className="mt-4">
-              <TextInput label="Dataset Name" value={newDatasetName} onChange={value => setNewDatasetName(value)} />
+              <TextInput label="数据集名称" value={newDatasetName} onChange={value => setNewDatasetName(value)} />
             </div>
 
             <div className="mt-6 flex justify-end space-x-3">
