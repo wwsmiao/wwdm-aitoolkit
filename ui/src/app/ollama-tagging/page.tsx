@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { TopBar, MainContent } from '@/components/layout';
@@ -36,6 +36,11 @@ export default function OllamaTaggingPage() {
   const [loadingTemplates, setLoadingTemplates] = useState(true);
 
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [mode, setMode] = useState("ollama");
+  const [modelPath, setModelPath] = useState("");
+  const [quantization, setQuantization] = useState("4bit");
+  const [attnImplementation, setAttnImplementation] = useState("sdpa");
+  const [maxNewTokens, setMaxNewTokens] = useState(2048);
   const [newName, setNewName] = useState('');
   const [newDesc, setNewDesc] = useState('');
   const [newPrompt, setNewPrompt] = useState('');
@@ -90,7 +95,7 @@ export default function OllamaTaggingPage() {
   };
 
   const handleDeleteTemplate = async (filename: string, name: string) => {
-    if (!confirm('确定要删除模板「' + name + '」吗？')) return;
+    if (!confirm('确认要删除模板「' + name + '」吗？')) return;
     try {
       const res = await fetch('/api/ollama/templates/delete', {
         method: 'POST',
@@ -123,16 +128,28 @@ export default function OllamaTaggingPage() {
     const controller = new AbortController();
     abortRef.current = controller;
     try {
-      const response = await fetch('/api/ollama/tag', {
+      const apiUrl = mode === 'local' ? '/api/local-tag' : '/api/ollama/tag';
+      const bodyData = mode === 'local'
+        ? {
+            imageDir: imageDir.trim(),
+            prompt: prompt.trim(),
+            triggerWord: triggerWord.trim() || '[trigger]',
+            modelPath: modelPath.trim(),
+            quantization: quantization,
+            attnImplementation: attnImplementation,
+            maxNewTokens: maxNewTokens,
+          }
+        : {
+            imageDir: imageDir.trim(),
+            model: model.trim() || 'llava',
+            prompt: prompt.trim(),
+            ollamaUrl: ollamaUrl.trim() || 'http://localhost:11434',
+            triggerWord: triggerWord.trim() || '[trigger]',
+          };
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          imageDir: imageDir.trim(),
-          model: model.trim() || 'llava',
-          prompt: prompt.trim(),
-          ollamaUrl: ollamaUrl.trim() || 'http://localhost:11434',
-          triggerWord: triggerWord.trim() || '[trigger]',
-        }),
+        body: JSON.stringify(bodyData),
         signal: controller.signal,
       });
       if (!response.ok) {
@@ -190,7 +207,7 @@ export default function OllamaTaggingPage() {
       if (err.name === 'AbortError') {
         addLog({ type: 'info', message: '已取消' });
       } else {
-        addLog({ type: 'error', message: '连接失败: ' + (err.message || err) });
+        addLog({ type: 'error', message: '请求失败: ' + (err.message || err) });
       }
     } finally {
       setIsRunning(false);
@@ -204,7 +221,7 @@ export default function OllamaTaggingPage() {
     <>
       <TopBar>
         <div>
-          <h1 className="text-2xl font-semibold text-gray-100">Ollama 打标</h1>
+          <h1 className="text-2xl font-semibold text-gray-100">图片打标</h1>
         </div>
         <div className="flex-1" />
       </TopBar>
@@ -214,6 +231,131 @@ export default function OllamaTaggingPage() {
           {/* 配置区域 */}
           <div className="bg-gray-900 rounded-lg p-6 space-y-4 border border-gray-700">
             <h2 className="text-lg font-medium text-gray-200">配置</h2>
+
+            {/* 模式选择 */}
+            <div className="flex items-center space-x-1 bg-gray-800 p-1 rounded-lg border border-gray-700 w-fit">
+              <button
+                onClick={() => setMode('ollama')}
+                disabled={isRunning}
+                className={'px-4 py-1.5 rounded-md text-sm font-medium transition-colors ' + (
+                  mode === 'ollama'
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700'
+                )}
+              >
+                Ollama API 模式
+              </button>
+              <button
+                onClick={() => setMode('local')}
+                disabled={isRunning}
+                className={'px-4 py-1.5 rounded-md text-sm font-medium transition-colors ' + (
+                  mode === 'local'
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700'
+                )}
+              >
+                本地模型模式
+              </button>
+            </div>
+
+            {/* 本地模型信息面板 */}
+            {mode === 'local' && (
+              <div className="bg-gray-800/80 border border-gray-700 rounded-lg p-3 text-sm space-y-1">
+                <div className="flex items-center space-x-2">
+                  <span className="w-2 h-2 rounded-full bg-blue-500 inline-block"></span>
+                  <span className="text-gray-300 font-medium">Qwen3-VL-8B-Instruct (本地推理)</span>
+                </div>
+                <p className="text-gray-500 ml-4">
+                  直接通过本地 GPU 运行，模型文件位于 <code className="bg-gray-700 px-1 rounded">./models/Qwen/Qwen3-VL-8B-Instruct</code> 目录。
+                </p>
+                <p className="text-gray-500 ml-4 flex items-center space-x-1">
+                  <span>模型架构：</span>
+                  <code className="bg-gray-700 px-1.5 py-0.5 rounded text-gray-300">Qwen3VLForConditionalGeneration</code>
+                  <span className="mx-1">|</span>
+                  <span>默认量化：</span>
+                  <code className="bg-gray-700 px-1.5 py-0.5 rounded text-gray-300">4-bit NF4</code>
+                  <span className="mx-1">|</span>
+                  <span>显存需求：</span>
+                  <code className="bg-gray-700 px-1.5 py-0.5 rounded text-gray-300">~6GB</code>
+                </p>
+                <p className="text-gray-500 ml-4">
+                  支持模型：Qwen3-VL-8B-Instruct（默认）、Qwen3.5-9B、以及其他 HuggingFace 格式的多模态模型
+                </p>
+              </div>
+            )}
+
+            {/* 本地模型路径 */}
+            {mode === 'local' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  模型路径
+                  <span className="text-gray-500 font-normal ml-2">（默认：./models/Qwen/Qwen3-VL-8B-Instruct）</span>
+                </label>
+                <input
+                  type="text"
+                  value={modelPath}
+                  onChange={e => setModelPath(e.target.value)}
+                  placeholder="./models/Qwen/Qwen3-VL-8B-Instruct"
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={isRunning}
+                />
+                <p className="text-xs text-gray-500 mt-1">本地模型的绝对目录路径，留空使用默认值</p>
+              </div>
+            )}
+
+            {/* 量化方式 */}
+            {mode === 'local' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">量化方式</label>
+                <select
+                  value={quantization}
+                  onChange={e => setQuantization(e.target.value)}
+                  disabled={isRunning}
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 [&_*:checked]:bg-blue-600"
+                >
+                  <option value="4bit">4-bit NF4（推荐，~6GB 显存）</option>
+                  <option value="8bit">8-bit（~9GB 显存）</option>
+                  <option value="none">无量化 / FP16（~18GB 显存）</option>
+                </select>
+              </div>
+            )}
+
+            {/* 注意力算法 */}
+            {mode === 'local' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">注意力算法</label>
+                <select
+                  value={attnImplementation}
+                  onChange={e => setAttnImplementation(e.target.value)}
+                  disabled={isRunning}
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="sdpa">SDPA（默认，推荐）</option>
+                  <option value="flash_attention_2">Flash Attention 2（需安装 flash_attn）</option>
+                  <option value="eager">Eager（最兼容）</option>
+                </select>
+              </div>
+            )}
+
+            {/* 最大生成 Token 数 */}
+            {mode === 'local' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  最大生成 Token 数
+                  <span className="text-gray-500 font-normal ml-2">（默认：2048）</span>
+                </label>
+                <input
+                  type="number"
+                  value={maxNewTokens}
+                  onChange={e => setMaxNewTokens(Math.max(64, Math.min(8192, parseInt(e.target.value) || 2048)))}
+                  min={64}
+                  max={8192}
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={isRunning}
+                />
+                <p className="text-xs text-gray-500 mt-1">控制每个图片生成的标注文本长度（64-8192）</p>
+              </div>
+            )}
 
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">图片目录路径 *</label>
@@ -225,39 +367,39 @@ export default function OllamaTaggingPage() {
                 className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 disabled={isRunning}
               />
-              <p className="text-xs text-gray-500 mt-1">图片目录的完整路径，程序会扫描该目录下所有图片并生成对应的 .txt 标注文件</p>
+              <p className="text-xs text-gray-500 mt-1">图片目录的绝对路径，程序将扫描目录下所有图片并生成对应的 .txt 标注文件</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
+              <div className={mode === "local" ? "hidden" : ""}>
                 <label className="block text-sm font-medium text-gray-300 mb-1">Ollama 地址</label>
                 <input
                   type="text"
-                  value={ollamaUrl}
+                  value={mode === "local" ? "http://localhost:11434" : ollamaUrl}
                   onChange={e => setOllamaUrl(e.target.value)}
                   placeholder="http://localhost:11434"
-                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  disabled={isRunning}
+                  className={"w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 " + (mode === "local" ? "opacity-50 cursor-not-allowed" : "")}
+                  disabled={isRunning || mode === "local"}
                 />
               </div>
-              <div>
+              <div className={mode === "local" ? "hidden" : ""}>
                 <label className="block text-sm font-medium text-gray-300 mb-1">模型名称</label>
                 <input
                   type="text"
-                  value={model}
+                  value={mode === "local" ? "Qwen3-VL-8B-Instruct" : model}
                   onChange={e => setModel(e.target.value)}
                   placeholder="llava"
-                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  disabled={isRunning}
+                  className={"w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 " + (mode === "local" ? "opacity-50 cursor-not-allowed" : "")}
+                  disabled={isRunning || mode === "local"}
                 />
-                <p className="text-xs text-gray-500 mt-1">需为支持图片输入的多模态模型（如 llava, moondream, minicpm-v, llama3.2-vision 等）</p>
+                <p className="text-xs text-gray-500 mt-1">请选择支持图片分析的多模态模型，如 llava, moondream, minicpm-v, llama3.2-vision 等</p>
               </div>
             </div>
 
             {/* 模板选择 */}
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className="block text-sm font-medium text-gray-300">指令模板</label>
+                <label className="block text-sm font-medium text-gray-300">提示词模板</label>
                 <button
                   onClick={() => setShowCreateModal(true)}
                   className="text-xs px-3 py-1 bg-green-700 text-green-200 rounded hover:bg-green-600 transition-colors"
@@ -277,7 +419,7 @@ export default function OllamaTaggingPage() {
                     <option value="">-- 手动输入 / 无模板 --</option>
                     {templates.map(tpl => (
                       <option key={tpl.filename} value={tpl.filename}>
-                        {tpl.name + (tpl.description ? ' — ' + tpl.description : '')}
+                        {tpl.name + (tpl.description ? ' - ' + tpl.description : '')}
                       </option>
                     ))}
                   </select>
@@ -295,16 +437,16 @@ export default function OllamaTaggingPage() {
                     disabled={isRunning}
                     title="删除模板"
                   >
-                    ✕
+                    ?
                   </button>
                 )}
               </div>
             </div>
 
-            {/* 触发词 */}
+            {/* 触发器 */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">
-                触发词 <span className="text-gray-500 font-normal">（用于替换模板中的 {'{chufaci}'} 占位符）</span>
+                触发器词汇 <span className="text-gray-500 font-normal">（将自动替换模板中的 {'{chufaci}'} 占位符）</span>
               </label>
               <input
                 type="text"
@@ -316,12 +458,12 @@ export default function OllamaTaggingPage() {
               />
             </div>
 
-            {/* 打标提示词 */}
+            {/* 提示词输入 */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">
-                打标提示词
+                提示词 / Prompt
                 {selectedTemplate && (
-                  <span className="text-gray-500 font-normal ml-2">（选中模板后自动填充，可手动修改）</span>
+                  <span className="text-gray-500 font-normal ml-2">（选择模板后自动填入，可手动修改）</span>
                 )}
               </label>
               <textarea
@@ -333,7 +475,7 @@ export default function OllamaTaggingPage() {
               />
               {prompt.includes('{chufaci}') && (
                 <p className="text-xs text-blue-400 mt-1">
-                  {'{chufaci}'} 将被替换为触发词: <code className="bg-gray-700 px-1 rounded">{triggerWord || '[trigger]'}</code>
+                  {'{chufaci}'} 将被替换为触发器：<code className="bg-gray-700 px-1 rounded">{triggerWord || '[trigger]'}</code>
                 </p>
               )}
             </div>
@@ -345,7 +487,7 @@ export default function OllamaTaggingPage() {
                   disabled={!imageDir.trim()}
                   className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
                 >
-                  开始打标
+                  {mode === 'local' ? '开始打标 (本地模型)' : '开始打标'}
                 </button>
               ) : (
                 <button
@@ -419,7 +561,7 @@ export default function OllamaTaggingPage() {
           <div className="fixed inset-0 z-50 flex items-center justify-center">
             <div className="absolute inset-0 bg-black bg-opacity-60" onClick={() => setShowCreateModal(false)} />
             <div className="relative bg-gray-900 border border-gray-700 rounded-xl p-6 w-full max-w-lg mx-4 shadow-2xl">
-              <h3 className="text-lg font-medium text-gray-200 mb-4">新建指令模板</h3>
+              <h3 className="text-lg font-medium text-gray-200 mb-4">新建提示词模板</h3>
               <div className="space-y-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1">模板名称 *</label>
@@ -432,18 +574,18 @@ export default function OllamaTaggingPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">描述（可选）</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-1">描述信息（可选）</label>
                   <input
                     type="text"
                     value={newDesc}
                     onChange={e => setNewDesc(e.target.value)}
-                    placeholder="例如: 适合训练用的详细描述"
+                    placeholder="例如: 适合训练用到的详细描述"
                     className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1">
-                    提示词 * <span className="text-gray-500 font-normal">（用 {'{chufaci}'} 表示触发词占位符）</span>
+                    提示词内容 * <span className="text-gray-500 font-normal">（使用 {'{chufaci}'} 表示触发器占位符）</span>
                   </label>
                   <textarea
                     value={newPrompt}
