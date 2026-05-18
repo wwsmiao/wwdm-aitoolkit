@@ -486,3 +486,42 @@ Only larger updates are listed here. There are usually smaller daily updated tha
 - Added support for SD 1.5 in the UI
 - Fixed UI Wan 2.1 14b name bug
 - Added support for for conv training in the UI for models that support it
+
+---
+
+## 新增功能 (Additional Features)
+
+### 1. 中文化界面 (Chinese UI Localization)
+
+全部前端界面已完成中文化汉语处理，包括侧栏、仪表盘、数据集、训练任务、设置、登录等全部页面。
+
+- 技术术语（如 FLUX.1、SDXL、LoRA 等）保留英文原文
+- 代码 props（如 onClose、confirmText 等）未受影响
+
+### 2. Ollama 打标 (Ollama Tagging)
+
+在界面中添加了“Ollama打标”功能，可以使用本地 Ollama API 自动生成图片描述文件（.txt）。
+
+- 支持 SSE 流式进度显示
+- 可自定义提示词模板（prompt_templates/ 文件夹）
+- 支持中途停止
+- 模板中使用 {chufaci} 占位符，用户可指定触发词
+
+#### API 接口
+- GET /api/ollama/templates/list - 列出模板
+- POST /api/ollama/templates/create - 创建模板
+- POST /api/ollama/templates/delete - 删除模板
+- POST /api/ollama/tag - 执行打标
+
+### 3. 图片批量处理 (Image Batch Processing)
+
+在界面中添加了“图片处理”功能，支持三种批量操作：
+
+- **批量缩放**: 5 种模式（指定宽度、指定高度、等比例、硬限、百分比）
+- **批量重命名**: 前缀 + 序号（如 my_image_001.jpg）
+- **格式转换**: JPEG / PNG / WebP / GIF 相互转换
+
+使用 sharp 库，支持 SSE 流式进度显示和中途停止。
+
+#### API 接口
+- POST /api/image-batch/process - 执行图片批量处理
