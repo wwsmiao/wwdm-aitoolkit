@@ -8,6 +8,7 @@ import { getTotalSteps } from '@/utils/jobs';
 import { Cpu, HardDrive, Info, Gauge } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import useJobLog from '@/hooks/useJobLog';
+import LossChart from '@/components/LossChart';
 
 interface JobOverviewProps {
   job: Job;
