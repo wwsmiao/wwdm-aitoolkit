@@ -17,6 +17,8 @@ function parseMetrics(log: string): MetricsPoint[] {
 
   // Try multiple regex patterns for different training log formats
   const patterns = [
+    // tqdm progress bar: 1000/1000 [time, it/s, lr: X, loss: Y]
+    /(\d+)\/\d+[^,]+,\s*loss:\s*([\d.]+(?:e[+-]?\d+)?)/i,
     // Step: NNN, Loss: X.XXXX, ...
     /[Ss]tep:\s*(\d+)[,\s]+[Ll]oss:\s*([\d.]+(?:e[+-]?\d+)?)/,
     // loss: X.XXXX @ step NNN

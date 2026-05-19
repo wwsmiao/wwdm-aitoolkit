@@ -10,9 +10,10 @@ import JobOverview from '@/components/JobOverview';
 import { redirect } from 'next/navigation';
 import JobActionBar from '@/components/JobActionBar';
 import JobConfigViewer from '@/components/JobConfigViewer';
+import LossView from '@/components/LossView';
 import { Job } from '@prisma/client';
 
-type PageKey = 'overview' | 'samples' | 'config';
+type PageKey = 'overview' | 'samples' | 'config' | 'loss';
 
 interface Page {
   name: string;
@@ -41,6 +42,12 @@ const pages: Page[] = [
     value: 'config',
     component: JobConfigViewer,
     mainCss: 'pt-[80px] px-0 pb-0',
+  },
+  {
+    name: 'Loss',
+    value: 'loss',
+    component: LossView,
+    mainCss: 'pt-24',
   },
 ];
 

@@ -1,4 +1,4 @@
-import { Job } from '@prisma/client';
+﻿import { Job } from '@prisma/client';
 import useGPUInfo from '@/hooks/useGPUInfo';
 import useCPUInfo from '@/hooks/useCPUInfo';
 import GPUWidget from '@/components/GPUWidget';
@@ -161,9 +161,14 @@ export default function JobOverview({ job }: JobOverviewProps) {
         <div>{isCPUInfoLoaded && cpuInfo && <CPUWidget cpu={cpuInfo} />}</div>
         <div className="mt-4">{isGPUInfoLoaded && gpuList.length > 0 && <GPUWidget gpu={gpuList[0]} />}</div>
         <div className="mt-4">
+          <LossChart jobId={job.id} />
+        </div>
+        <div className="mt-4">
           <FilesWidget jobID={job.id} />
         </div>
       </div>
     </div>
   );
 }
+
+

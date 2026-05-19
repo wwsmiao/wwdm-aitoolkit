@@ -1,4 +1,4 @@
-import copy
+﻿﻿import copy
 import glob
 import inspect
 import json
@@ -2220,6 +2220,10 @@ class BaseSDTrainProcess(BaseTrainProcess):
 
                     if self.progress_bar is not None:
                         self.progress_bar.set_postfix_str(prog_bar_string)
+
+                    # Print loss in parsable format for Metrics API
+                    if self.accelerator.is_main_process and loss_dict is not None:
+                        print_acc(f"Step: {self.step_num}, Loss: {loss_dict.get('loss', 0.0):.6e}")
 
                 # if the batch is a DataLoaderBatchDTO, then we need to clean it up
                 if isinstance(batch, DataLoaderBatchDTO):

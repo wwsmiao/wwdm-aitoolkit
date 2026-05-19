@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useMemo } from 'react';
 import {
   modelArchs,
@@ -549,6 +549,7 @@ export default function SimpleJob({
                     { value: 'mae', label: '平均绝对误差 (MAE)' },
                     { value: 'wavelet', label: 'Wavelet' },
                     { value: 'stepped', label: '阶梯恢复 (Stepped Recovery)' },
+                    { value: 'mean_flow', label: '平均流 (Mean Flow)' },
                   ]}
                 />
               </div>
