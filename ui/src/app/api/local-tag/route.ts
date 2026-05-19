@@ -1,5 +1,5 @@
-﻿import { NextRequest } from 'next/server';
-import { spawn } from 'child_process';
+import { NextRequest } from 'next/server';
+import { spawn, execSync } from 'child_process';
 import path from 'path';
 import fs from 'fs';
 
@@ -23,34 +23,75 @@ function getImageFiles(dirPath: string): string[] {
   return results;
 }
 
+/**
+ * Auto-detect Python executable with fallback chain:
+ *   1. Windows venv  -> venv\Scripts\python.exe
+ *   2. Linux/macOS venv -> venv/bin/python3 or venv/bin/python
+ *   3. PYTHON_PATH env var (for custom Docker setups)
+ *   4. python3 / python in PATH
+ */
+function findPython(projectRoot: string): string | null {
+  // 1. Windows venv
+  const winVenv = path.join(projectRoot, 'venv', 'Scripts', 'python.exe');
+  if (fs.existsSync(winVenv)) return winVenv;
+
+  // 2. Linux/macOS venv
+  const unixVenv = path.join(projectRoot, 'venv', 'bin', 'python3');
+  if (fs.existsSync(unixVenv)) return unixVenv;
+  const unixVenvAlt = path.join(projectRoot, 'venv', 'bin', 'python');
+  if (fs.existsSync(unixVenvAlt)) return unixVenvAlt;
+
+  // 3. Custom env var override (for Docker / non-standard paths)
+  if (process.env.PYTHON_PATH && fs.existsSync(process.env.PYTHON_PATH)) {
+    return process.env.PYTHON_PATH!;
+  }
+
+  // 4. PATH fallback
+  try {
+    const which = process.platform === 'win32' ? 'where' : 'which';
+    const py3 = execSync(which + ' python3', { encoding: 'utf8' }).trim().split(/\\r?\\n/)[0];
+    if (py3) return py3;
+  } catch { /* python3 not in PATH */ }
+  try {
+    const which = process.platform === 'win32' ? 'where' : 'which';
+    const py = execSync(which + ' python', { encoding: 'utf8' }).trim().split(/\\r?\\n/)[0];
+    if (py) return py;
+  } catch { /* python not in PATH */ }
+
+  return null;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { imageDir = '', prompt = '', triggerWord = '[trigger]', modelPath = '', quantization = '4bit', attnImplementation = 'sdpa', maxNewTokens = 2048 } = body;
 
     if (!imageDir) {
-      return new Response(JSON.stringify({ error: '请指定图片目录路径' }), { status: 400 });
+      return new Response(JSON.stringify({ error: '��δָ��ͼƬĿ¼·��' }), { status: 400 });
     }
     if (!fs.existsSync(imageDir)) {
-      return new Response(JSON.stringify({ error: '目录不存在: ' + imageDir }), { status: 400 });
+      return new Response(JSON.stringify({ error: 'Ŀ¼������: ' + imageDir }), { status: 400 });
     }
     if (!fs.statSync(imageDir).isDirectory()) {
-      return new Response(JSON.stringify({ error: '路径不是目录: ' + imageDir }), { status: 400 });
+      return new Response(JSON.stringify({ error: '·������Ŀ¼: ' + imageDir }), { status: 400 });
     }
 
     const imageFiles = getImageFiles(imageDir);
     if (imageFiles.length === 0) {
-      return new Response(JSON.stringify({ error: '目录中未找到图片文件' }), { status: 400 });
+      return new Response(JSON.stringify({ error: 'Ŀ¼��δ�ҵ�ͼƬ�ļ�' }), { status: 400 });
     }
 
     const scriptPath = path.resolve(process.cwd(), '..', 'scripts', 'qwen_local_tagger.py');
-    const venvPython = path.resolve(process.cwd(), '..', 'venv', 'Scripts', 'python.exe');
-
     if (!fs.existsSync(scriptPath)) {
-      return new Response(JSON.stringify({ error: '找不到本地模型脚本: ' + scriptPath }), { status: 500 });
+      return new Response(JSON.stringify({ error: '�Ҳ�������ģ�ͽű�: ' + scriptPath }), { status: 500 });
     }
-    if (!fs.existsSync(venvPython)) {
-      return new Response(JSON.stringify({ error: '找不到 Python 环境: ' + venvPython }), { status: 500 });
+
+    const projectRoot = path.resolve(process.cwd(), '..');
+    const pythonPath = findPython(projectRoot);
+    if (!pythonPath) {
+      return new Response(JSON.stringify({
+        error: 'δ�ҵ� Python �����ҡ������� PYTHON_PATH ������ָ��·������ȷ�� Python �Ѱ�װ�� PATH �С�'
+      }), { status: 500 });
     }
 
     const encoder = new TextEncoder();
@@ -70,13 +111,13 @@ export async function POST(request: NextRequest) {
     const stream = new ReadableStream({
       async start(controller) {
         const sendEvent = (type: string, data: any) => {
-          const msg = JSON.stringify({ type, ...data }) + '\n';
+          const msg = JSON.stringify({ type, ...data }) + '\\n';
           safeEnqueue(controller, msg);
         };
 
         sendEvent('start', {
           total: imageFiles.length,
-          message: '找到 ' + imageFiles.length + ' 张图片，调用本地模型处理...',
+          message: '�ҵ� ' + imageFiles.length + ' ��ͼƬ�����ñ���ģ�ʹ���...',
         });
 
         const pythonArgs = [
@@ -92,15 +133,12 @@ export async function POST(request: NextRequest) {
           pythonArgs.push('--model-path', modelPath.trim());
         }
 
-        const proc = spawn(venvPython, pythonArgs, {
+        const proc = spawn(pythonPath, pythonArgs, {
           stdio: ['ignore', 'pipe', 'pipe'],
           timeout: 3600000,
           env: {
             ...process.env,
             PYTHONIOENCODING: 'utf-8:replace',
-            // Intentionally NOT setting PYTHONUTF8=1
-            // so library subprocesses use system encoding (CP936 on Chinese Windows)
-            // instead of crashing on GBK output decoded as UTF-8
           },
         });
 
@@ -108,7 +146,7 @@ export async function POST(request: NextRequest) {
         let buffer = '';
         proc.stdout.on('data', (chunk: Buffer) => {
           buffer += chunk.toString('utf-8');
-          const lines = buffer.split('\n');
+          const lines = buffer.split('\\n');
           buffer = lines.pop() || '';
           for (const line of lines) {
             if (!line.trim()) continue;
@@ -148,7 +186,7 @@ export async function POST(request: NextRequest) {
         });
 
         proc.on('error', (err: Error) => {
-          sendEvent('error', { message: '进程错误: ' + err.message });
+          sendEvent('error', { message: '���̴���: ' + err.message });
           isControllerClosed = true;
           try { controller.close(); } catch { /* ignore */ }
         });
