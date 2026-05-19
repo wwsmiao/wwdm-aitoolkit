@@ -25,7 +25,7 @@ function getImageFiles(dirPath: string): string[] {
 
 /**
  * Auto-detect Python executable with fallback chain:
- *   1. Windows venv  -> venv\Scripts\python.exe
+ *   1. Windows venv  -> venv\\Scripts\\python.exe
  *   2. Linux/macOS venv -> venv/bin/python3 or venv/bin/python
  *   3. PYTHON_PATH env var (for custom Docker setups)
  *   4. python3 / python in PATH
@@ -67,30 +67,30 @@ export async function POST(request: NextRequest) {
     const { imageDir = '', prompt = '', triggerWord = '[trigger]', modelPath = '', quantization = '4bit', attnImplementation = 'sdpa', maxNewTokens = 2048 } = body;
 
     if (!imageDir) {
-      return new Response(JSON.stringify({ error: '��δָ��ͼƬĿ¼·��' }), { status: 400 });
+      return new Response(JSON.stringify({ error: '\u672a\u6307\u5b9a\u56fe\u7247\u76ee\u5f55\u8def\u5f84' }), { status: 400 });
     }
     if (!fs.existsSync(imageDir)) {
-      return new Response(JSON.stringify({ error: 'Ŀ¼������: ' + imageDir }), { status: 400 });
+      return new Response(JSON.stringify({ error: '\u76ee\u5f55\u4e0d\u5b58\u5728: ' + imageDir }), { status: 400 });
     }
     if (!fs.statSync(imageDir).isDirectory()) {
-      return new Response(JSON.stringify({ error: '·������Ŀ¼: ' + imageDir }), { status: 400 });
+      return new Response(JSON.stringify({ error: '\u8def\u5f84\u4e0d\u662f\u76ee\u5f55: ' + imageDir }), { status: 400 });
     }
 
     const imageFiles = getImageFiles(imageDir);
     if (imageFiles.length === 0) {
-      return new Response(JSON.stringify({ error: 'Ŀ¼��δ�ҵ�ͼƬ�ļ�' }), { status: 400 });
+      return new Response(JSON.stringify({ error: '\u76ee\u5f55\u4e2d\u672a\u627e\u5230\u56fe\u7247\u6587\u4ef6' }), { status: 400 });
     }
 
     const scriptPath = path.resolve(process.cwd(), '..', 'scripts', 'qwen_local_tagger.py');
     if (!fs.existsSync(scriptPath)) {
-      return new Response(JSON.stringify({ error: '�Ҳ�������ģ�ͽű�: ' + scriptPath }), { status: 500 });
+      return new Response(JSON.stringify({ error: '\u627e\u4e0d\u5230\u672c\u5730\u6a21\u578b\u811a\u672c: ' + scriptPath }), { status: 500 });
     }
 
     const projectRoot = path.resolve(process.cwd(), '..');
     const pythonPath = findPython(projectRoot);
     if (!pythonPath) {
       return new Response(JSON.stringify({
-        error: 'δ�ҵ� Python �����ҡ������� PYTHON_PATH ������ָ��·������ȷ�� Python �Ѱ�װ�� PATH �С�'
+        error: '\u672a\u627e\u5230 Python \u53ef\u6267\u884c\u6587\u4ef6\u3002\u53ef\u8bbe\u7f6e PYTHON_PATH \u73af\u5883\u53d8\u91cf\u6307\u5b9a\u8def\u5f84\uff0c\u6216\u786e\u4fdd Python \u5df2\u5b89\u88c5\u5728 PATH \u4e2d\u3002'
       }), { status: 500 });
     }
 
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
 
         sendEvent('start', {
           total: imageFiles.length,
-          message: '�ҵ� ' + imageFiles.length + ' ��ͼƬ�����ñ���ģ�ʹ���...',
+          message: '\u627e\u5230 ' + imageFiles.length + ' \u5f20\u56fe\u7247\uff0c\u4f7f\u7528\u672c\u5730\u6a21\u578b\u5904\u7406...',
         });
 
         const pythonArgs = [
@@ -186,7 +186,7 @@ export async function POST(request: NextRequest) {
         });
 
         proc.on('error', (err: Error) => {
-          sendEvent('error', { message: '���̴���: ' + err.message });
+          sendEvent('error', { message: '\u8fdb\u7a0b\u9519\u8bef: ' + err.message });
           isControllerClosed = true;
           try { controller.close(); } catch { /* ignore */ }
         });
