@@ -197,7 +197,6 @@ def process_image(model, processor, image_path, prompt, trigger_word, device, ma
 
     caption = processor.batch_decode(
         generated_ids, skip_special_tokens=True,
-        clean_up_tokenization_spaces=False,
     )[0].strip()
 
     return caption

@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
     const stream = new ReadableStream({
       async start(controller) {
         const sendEvent = (type: string, data: any) => {
-          const msg = JSON.stringify({ type, ...data }) + '\\n';
+          const msg = JSON.stringify({ type, ...data }) + '\n';
           safeEnqueue(controller, msg);
         };
 
@@ -146,7 +146,7 @@ export async function POST(request: NextRequest) {
         let buffer = '';
         proc.stdout.on('data', (chunk: Buffer) => {
           buffer += chunk.toString('utf-8');
-          const lines = buffer.split('\\n');
+          const lines = buffer.split('\n');
           buffer = lines.pop() || '';
           for (const line of lines) {
             if (!line.trim()) continue;
