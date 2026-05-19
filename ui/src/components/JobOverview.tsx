@@ -20,6 +20,7 @@ export default function JobOverview({ job }: JobOverviewProps) {
   const logRef = useRef<HTMLDivElement>(null);
   // Track whether we should auto-scroll to bottom
   const [isScrolledToBottom, setIsScrolledToBottom] = useState(true);
+  const [currentLoss, setCurrentLoss] = useState<string | null>(null);
 
   const { gpuList, isGPUInfoLoaded } = useGPUInfo(gpuIds, 5000);
   const { cpuInfo, isCPUInfoLoaded } = useCPUInfo(5000);
@@ -53,6 +54,26 @@ export default function JobOverview({ job }: JobOverviewProps) {
       setIsScrolledToBottom(isAtBottom);
     }
   };
+
+  // Fetch latest loss from metrics API
+  useEffect(() => {
+    const fetchLoss = async () => {
+      try {
+        const res = await fetch(`/api/jobs/${job.id}/metrics`);
+        const data = await res.json();
+        if (data.metrics && data.metrics.length > 0) {
+          const latest = data.metrics[data.metrics.length - 1];
+          const lossVal = typeof latest.loss === "number" ? latest.loss.toFixed(6) : latest.loss;
+          setCurrentLoss(String(lossVal));
+        }
+      } catch (e) {
+        // ignore
+      }
+    };
+    fetchLoss();
+    const interval = setInterval(fetchLoss, 5000);
+    return () => clearInterval(interval);
+  }, [job.id]);
 
   // Auto-scroll to bottom only if we were already at the bottom
   useEffect(() => {
@@ -100,7 +121,7 @@ export default function JobOverview({ job }: JobOverviewProps) {
             <div className="flex items-center justify-between text-sm">
               <span className="text-gray-400">进度</span>
               <span className="text-gray-200">
-                Step {job.step} of {totalSteps}
+                Step {job.step} of {totalSteps}{currentLoss !== null ? `  |  Loss: ${parseFloat(currentLoss).toExponential(3)}` : ""}
               </span>
             </div>
             <div className="w-full bg-gray-800 rounded-full h-2">
@@ -135,6 +156,9 @@ export default function JobOverview({ job }: JobOverviewProps) {
             </div>
           </div>
 
+          {/* Loss Curve Chart */}
+          <LossChart jobId={job.id} />
+
           {/* Log - Now using flex-grow to fill remaining space */}
           <div className="bg-gray-950 rounded-lg p-4 relative flex-grow min-h-60">
             <div
@@ -160,9 +184,6 @@ export default function JobOverview({ job }: JobOverviewProps) {
       <div className="col-span-1">
         <div>{isCPUInfoLoaded && cpuInfo && <CPUWidget cpu={cpuInfo} />}</div>
         <div className="mt-4">{isGPUInfoLoaded && gpuList.length > 0 && <GPUWidget gpu={gpuList[0]} />}</div>
-        <div className="mt-4">
-          <LossChart jobId={job.id} />
-        </div>
         <div className="mt-4">
           <FilesWidget jobID={job.id} />
         </div>
