@@ -1,3 +1,4 @@
+import { MdDashboard, MdImage, MdShowChart, MdCode } from 'react-icons/md';
 'use client';
 
 import { useState, use } from 'react';
@@ -7,17 +8,21 @@ import { TopBar, MainContent } from '@/components/layout';
 import useJob from '@/hooks/useJob';
 import SampleImages, { SampleImagesMenu } from '@/components/SampleImages';
 import JobOverview from '@/components/JobOverview';
+
+
 import { redirect } from 'next/navigation';
 import JobActionBar from '@/components/JobActionBar';
 import JobConfigViewer from '@/components/JobConfigViewer';
-import LossView from '@/components/LossView';
+import JobLossGraph from '@/components/JobLossGraph';
+import JobLossGraph from '@/components/JobLossGraph';
 import { Job } from '@prisma/client';
 
-type PageKey = 'overview' | 'samples' | 'config' | 'loss';
+type PageKey = 'overview' | 'samples' | 'config' | 'loss_log';
 
 interface Page {
   name: string;
   value: PageKey;
+  icon: React.ComponentType<{ className?: string }>;
   component: React.ComponentType<{ job: Job }>;
   menuItem?: React.ComponentType<{ job?: Job | null }> | null;
   mainCss?: string;
@@ -27,12 +32,14 @@ const pages: Page[] = [
   {
     name: '概览',
     value: 'overview',
+    icon: MdDashboard,
     component: JobOverview,
     mainCss: 'pt-24',
   },
   {
     name: 'Samples',
     value: 'samples',
+    icon: MdImage,
     component: SampleImages,
     menuItem: SampleImagesMenu,
     mainCss: 'pt-24',
@@ -40,14 +47,16 @@ const pages: Page[] = [
   {
     name: '配置文件',
     value: 'config',
+    icon: MdCode,
     component: JobConfigViewer,
     mainCss: 'pt-[80px] px-0 pb-0',
   },
   {
-    name: 'Loss',
-    value: 'loss',
-    component: LossView,
-    mainCss: 'pt-24',
+    name: 'Loss Graph',
+    value: 'loss_log',
+    icon: MdShowChart,
+    component: JobLossGraph,
+    mainCss: 'pt-24 pb-4',
   },
 ];
 
@@ -101,8 +110,9 @@ export default function JobPage({ params }: { params: { jobID: string } }) {
           <Button
             key={page.value}
             onClick={() => setPageKey(page.value)}
-            className={`px-4 py-1 h-8  ${page.value === pageKey ? 'bg-gray-300 dark:bg-gray-700' : ''}`}
+            className={`px-4 py-1 h-8 flex items-center gap-1.5 ${page.value === pageKey ? 'bg-gray-300 dark:bg-gray-700' : ''}`}
           >
+            <page.icon className="text-sm" />
             {page.name}
           </Button>
         ))}
