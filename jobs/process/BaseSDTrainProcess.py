@@ -1,4 +1,4 @@
-﻿﻿import copy
+import copy
 import glob
 import inspect
 import json
