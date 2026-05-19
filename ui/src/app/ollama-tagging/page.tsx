@@ -221,39 +221,52 @@ export default function OllamaTaggingPage() {
     <>
       <TopBar>
         <div>
-          <h1 className="text-2xl font-semibold text-gray-100">图片打标</h1>
+          <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
+            <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          </div>
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-100">图片打标</h1>
+            <p className="text-xs text-gray-500 mt-0.5">Ollama API · 本地模型 · 自动标注</p>
+          </div>
+        </div>
         </div>
         <div className="flex-1" />
       </TopBar>
 
       <MainContent>
-        <div className="max-w-4xl mx-auto space-y-6">
+        <div className="max-w-5xl mx-auto space-y-6">
           {/* 配置区域 */}
-          <div className="bg-gray-900 rounded-lg p-6 space-y-4 border border-gray-700">
-            <h2 className="text-lg font-medium text-gray-200">配置</h2>
+          <div className="bg-gray-900 rounded-xl p-6 space-y-5 border border-gray-700/60 shadow-lg">
+            <div className="flex items-center gap-2 pb-2 border-b border-gray-700/50">
+            <div className="w-1 h-5 bg-gradient-to-b from-purple-500 to-pink-500 rounded-full"></div>
+            <h2 className="text-lg font-semibold text-gray-200">配置</h2>
+          </div>
 
             {/* 模式选择 */}
-            <div className="flex items-center space-x-1 bg-gray-800 p-1 rounded-lg border border-gray-700 w-fit">
+            <div className="inline-flex bg-gray-800/80 p-1 rounded-xl border border-gray-700/50 shadow-inner">
               <button
                 onClick={() => setMode('ollama')}
                 disabled={isRunning}
-                className={'px-4 py-1.5 rounded-md text-sm font-medium transition-colors ' + (
+                className={'px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ' + (
                   mode === 'ollama'
-                    ? 'bg-blue-600 text-white shadow-sm'
-                    : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700'
+                    ? 'bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-600/20'
+                    : 'text-gray-400 hover:text-gray-200'
                 )}
               >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
                 Ollama API 模式
               </button>
               <button
                 onClick={() => setMode('local')}
                 disabled={isRunning}
-                className={'px-4 py-1.5 rounded-md text-sm font-medium transition-colors ' + (
+                className={'px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ' + (
                   mode === 'local'
-                    ? 'bg-blue-600 text-white shadow-sm'
-                    : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700'
+                    ? 'bg-gradient-to-r from-purple-600 to-purple-500 text-white shadow-lg shadow-purple-600/20'
+                    : 'text-gray-400 hover:text-gray-200'
                 )}
               >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2a8 8 0 0 0-8 8c0 2.5 1.5 5 4 7l4 5 4-5c2.5-2 4-4.5 4-7a8 8 0 0 0-8-8z"/><circle cx="12" cy="10" r="3"/></svg>
                 本地模型模式
               </button>
             </div>
@@ -328,7 +341,7 @@ export default function OllamaTaggingPage() {
                   value={attnImplementation}
                   onChange={e => setAttnImplementation(e.target.value)}
                   disabled={isRunning}
-                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600/60 rounded-lg text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500/50 hover:border-gray-500 transition-all duration-200"
                 >
                   <option value="sdpa">SDPA（默认，推荐）</option>
                   <option value="flash_attention_2">Flash Attention 2（需安装 flash_attn）</option>
@@ -350,7 +363,7 @@ export default function OllamaTaggingPage() {
                   onChange={e => setMaxNewTokens(Math.max(64, Math.min(8192, parseInt(e.target.value) || 2048)))}
                   min={64}
                   max={8192}
-                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-600/60 rounded-lg text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500/50 hover:border-gray-500 transition-all duration-200"
                   disabled={isRunning}
                 />
                 <p className="text-xs text-gray-500 mt-1">控制每个图片生成的标注文本长度（64-8192）</p>
@@ -402,10 +415,11 @@ export default function OllamaTaggingPage() {
                 <label className="block text-sm font-medium text-gray-300">提示词模板</label>
                 <button
                   onClick={() => setShowCreateModal(true)}
-                  className="text-xs px-3 py-1 bg-green-700 text-green-200 rounded hover:bg-green-600 transition-colors"
+                  className="text-xs px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-emerald-500 text-emerald-100 rounded-lg hover:from-emerald-700 hover:to-emerald-600 transition-all duration-200 shadow-lg shadow-emerald-600/10 flex items-center gap-1"
                   disabled={isRunning}
                 >
-                  + 新建模板
+                  <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  新建模板
                 </button>
               </div>
               <div className="flex items-center space-x-2">
@@ -470,7 +484,7 @@ export default function OllamaTaggingPage() {
                 value={prompt}
                 onChange={e => setPrompt(e.target.value)}
                 rows={4}
-                className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-vertical font-mono text-xs"
+                className="w-full px-3 py-2 bg-gray-800 border border-gray-600/60 rounded-lg text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500/50 hover:border-gray-500 transition-all duration-200 resize-vertical font-mono text-xs"
                 disabled={isRunning}
               />
               {prompt.includes('{chufaci}') && (
@@ -492,8 +506,9 @@ export default function OllamaTaggingPage() {
               ) : (
                 <button
                   onClick={stopTagging}
-                  className="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors font-medium"
+                  className="px-6 py-2.5 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-lg hover:from-red-700 hover:to-red-600 transition-all duration-200 font-medium shadow-lg shadow-red-600/20 inline-flex items-center gap-2"
                 >
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
                   停止
                 </button>
               )}
@@ -502,8 +517,8 @@ export default function OllamaTaggingPage() {
 
           {/* 进度 */}
           {progress.total > 0 && (
-            <div className="bg-gray-900 rounded-lg p-6 border border-gray-700">
-              <h2 className="text-lg font-medium text-gray-200 mb-3">进度</h2>
+            <div className="bg-gray-900 rounded-xl p-6 border border-gray-700/60 shadow-lg">
+              <div className="flex items-center gap-2 mb-4"><div className="w-1 h-5 bg-gradient-to-b from-purple-500 to-pink-500 rounded-full"></div><h2 className="text-lg font-semibold text-gray-200">进度</h2></div>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm text-gray-400">
                   <span>{progress.current} / {progress.total}</span>
@@ -513,9 +528,9 @@ export default function OllamaTaggingPage() {
                     失败: <span className="text-red-400">{progress.fail}</span>
                   </span>
                 </div>
-                <div className="w-full bg-gray-700 rounded-full h-2.5">
+                <div className="w-full bg-gray-700/50 rounded-full h-3 overflow-hidden shadow-inner">
                   <div
-                    className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+                    className="h-full rounded-full transition-all duration-500 ease-out bg-gradient-to-r from-blue-500 via-purple-400 to-pink-400"
                     style={{ width: Math.round((progress.current / progress.total) * 100) + '%' }}
                   />
                 </div>
@@ -525,22 +540,24 @@ export default function OllamaTaggingPage() {
 
           {/* 日志 */}
           {logs.length > 0 && (
-            <div className="bg-gray-900 rounded-lg p-6 border border-gray-700">
-              <h2 className="text-lg font-medium text-gray-200 mb-3">日志</h2>
-              <div className="bg-gray-950 rounded-md p-4 max-h-96 overflow-y-auto font-mono text-sm space-y-1">
+            <div className="bg-gray-900 rounded-xl p-6 border border-gray-700/60 shadow-lg">
+              <div className="flex items-center justify-between mb-4"><div className="flex items-center gap-2"><div className="w-1 h-5 bg-gradient-to-b from-gray-500 to-gray-400 rounded-full"></div><h2 className="text-lg font-semibold text-gray-200">日志</h2></div></div>
+              <div className="bg-gray-950 rounded-lg p-4 max-h-96 overflow-y-auto font-mono text-sm space-y-1.5 border border-gray-800/50">
                 {logs.map((log, idx) => (
                   <div
                     key={idx}
                     className={
-                      'leading-relaxed ' +
+                      'leading-relaxed flex items-start gap-2 ' +
                       (log.type === 'success' ? 'text-green-400' :
                       log.type === 'skip' ? 'text-yellow-400' :
                       log.type === 'error' ? 'text-red-400' :
-                      log.type === 'complete' ? 'text-blue-400 font-bold' :
+                      log.type === 'complete' ? 'text-blue-400 font-semibold' :
                       log.type === 'start' ? 'text-blue-300' :
+                      log.type === 'info' ? 'text-gray-400' :
                       'text-gray-300')
                     }
                   >
+                    <span className="text-gray-600 select-none shrink-0">[{idx + 1}]</span>
                     {log.message}
                     {log.caption && (
                       <details className="ml-4 mt-1">
@@ -560,8 +577,11 @@ export default function OllamaTaggingPage() {
         {showCreateModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center">
             <div className="absolute inset-0 bg-black bg-opacity-60" onClick={() => setShowCreateModal(false)} />
-            <div className="relative bg-gray-900 border border-gray-700 rounded-xl p-6 w-full max-w-lg mx-4 shadow-2xl">
-              <h3 className="text-lg font-medium text-gray-200 mb-4">新建提示词模板</h3>
+            <div className="relative bg-gray-900 border border-gray-700/60 rounded-xl p-6 w-full max-w-lg mx-4 shadow-2xl shadow-purple-900/10">
+              <div className="flex items-center gap-2 pb-3 mb-4 border-b border-gray-700/50">
+                <div className="w-1 h-5 bg-gradient-to-b from-green-500 to-emerald-500 rounded-full"></div>
+                <h3 className="text-lg font-semibold text-gray-200">新建提示词模板</h3>
+              </div>
               <div className="space-y-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1">模板名称 *</label>
@@ -592,21 +612,21 @@ export default function OllamaTaggingPage() {
                     onChange={e => setNewPrompt(e.target.value)}
                     rows={5}
                     placeholder="Describe this image... {chufaci}"
-                    className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-vertical font-mono text-xs"
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-600/60 rounded-lg text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500/50 hover:border-gray-500 transition-all duration-200 resize-vertical font-mono text-xs"
                   />
                 </div>
               </div>
               <div className="flex justify-end space-x-3 mt-6">
                 <button
                   onClick={() => setShowCreateModal(false)}
-                  className="px-4 py-2 bg-gray-700 text-gray-300 rounded-md hover:bg-gray-600 transition-colors"
+                  className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-all duration-200"
                 >
                   取消
                 </button>
                 <button
                   onClick={handleCreateTemplate}
                   disabled={!newName.trim() || !newPrompt.trim()}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                  className="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-lg hover:from-blue-700 hover:to-blue-600 disabled:opacity-50 transition-all duration-200 shadow-lg shadow-blue-600/20"
                 >
                   创建
                 </button>
