@@ -79,7 +79,7 @@ export default function SampleControlImage({
 
   const clearImage = useCallback(
     (e?: React.MouseEvent) => {
-      console.log('clearImage');
+      // debug: console.log('clearImage');
       if (e) {
         e.stopPropagation();
         e.preventDefault();
@@ -136,7 +136,7 @@ export default function SampleControlImage({
         }}
       />
 
-      {/* Empty state — centered */}
+      {/* Empty state -- centered */}
       {!backgroundUrl && (
         <div className="flex flex-col items-center justify-center text-gray-300 text-center">
           <FaImage className="opacity-80" />

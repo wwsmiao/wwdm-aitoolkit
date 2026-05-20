@@ -252,4 +252,19 @@ export interface GroupedSelectOption {
   readonly options: SelectOption[];
 }
 
+
+export interface CaptionJobConfig {
+  job: string;
+  config: {
+    name: string;
+    process: Array<{
+      type: string;
+      sqlite_db_path?: string;
+      device?: string;
+      caption?: Record<string, any>;
+      [key: string]: any;
+    }>;
+    [key: string]: any;
+  };
+}
 export type JobStatus = 'queued' | 'running' | 'stopping' | 'stopped' | 'completed' | 'error';

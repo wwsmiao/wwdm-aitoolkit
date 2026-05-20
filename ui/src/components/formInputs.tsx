@@ -28,6 +28,7 @@ export interface TextInputProps extends InputProps {
   onChange: (value: string) => void;
   type?: 'text' | 'password';
   disabled?: boolean;
+  suffix?: string;
 }
 
 export const TextInput = forwardRef<HTMLInputElement, TextInputProps>((props: TextInputProps, ref) => {
@@ -149,6 +150,7 @@ export interface SelectInputProps extends InputProps {
   disabled?: boolean;
   onChange: (value: string) => void;
   options: GroupedSelectOption[] | SelectOption[];
+  multiple?: boolean;
 }
 
 export const SelectInput = (props: SelectInputProps) => {
@@ -306,6 +308,50 @@ export interface SliderInputProps extends InputProps {
   disabled?: boolean;
   showValue?: boolean;
 }
+
+// CreatableSelectInput - SelectInput that allows creating new options
+export interface CreatableSelectInputProps extends SelectInputProps {}
+
+export const CreatableSelectInput = (props: CreatableSelectInputProps) => {
+  const { options, value, onChange } = props;
+  const handleChange = (newValue: string) => {
+    if (newValue === '__create_new__') {
+      const newOption = prompt('Enter new option:');
+      if (newOption) onChange?.(newOption);
+    } else {
+      onChange?.(newValue);
+    }
+  };
+  const allOptions: (SelectOption | GroupedSelectOption)[] = [
+    ...options,
+    { label: '+ Create New', value: '__create_new__' },
+  ];
+  return <SelectInput {...props} options={allOptions as SelectOption[]} onChange={handleChange} />;
+};
+
+// TextAreaInput - multiline text input
+export interface TextAreaInputProps extends InputProps {
+  value?: string;
+  onChange?: (value: string) => void;
+  rows?: number;
+  placeholder?: string;
+}
+
+export const TextAreaInput = (props: TextAreaInputProps) => {
+  const { label, value, onChange, rows = 4, placeholder } = props;
+  return (
+    <div>
+      {label && <label className="block text-sm font-medium text-gray-300 mb-1">{label}</label>}
+      <textarea
+        className="w-full bg-gray-800 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+        rows={rows}
+        value={value as string || ''}
+        onChange={e => onChange?.(e.target.value)}
+        placeholder={placeholder}
+      />
+    </div>
+  );
+};
 
 export const SliderInput: React.FC<SliderInputProps> = props => {
   const { label, value, onChange, min, max, step = 1, disabled, className, docKey = null, showValue = true } = props;

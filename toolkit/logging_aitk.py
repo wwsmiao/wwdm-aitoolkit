@@ -75,7 +75,7 @@ class WandbLogger(EmptyLogger):
         self.run.finish()
 
 # create logger based on the logging config
-def create_logger(logging_config: LoggingConfig, all_config: OrderedDict):
+def create_logger(logging_config: LoggingConfig, all_config: OrderedDict, save_root: Optional[str] = None):
     if logging_config.use_wandb:
         project_name = logging_config.project_name
         run_name = logging_config.run_name

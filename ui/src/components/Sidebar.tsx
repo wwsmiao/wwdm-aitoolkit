@@ -1,10 +1,10 @@
-﻿'use client';
+'use client';
 import Link from 'next/link';
 import { useState } from 'react';
 import {
   Home, Settings, BrainCircuit, Images, Plus, ImageDown,
   Tags, Code2, ChevronDown, ChevronRight, ExternalLink,
-  Heart, MessageCircle, QrCode
+  Heart, MessageCircle, QrCode, Box
 } from 'lucide-react';
 import { FaXTwitter, FaDiscord, FaYoutube, FaBilibili, FaWeixin, FaQq } from 'react-icons/fa6';
 
@@ -18,6 +18,7 @@ const Sidebar = () => {
     { name: '数据集', href: '/datasets', icon: Images },
     { name: '图片处理', href: '/image-batch', icon: ImageDown },
     { name: '图片打标', href: '/ollama-tagging', icon: Tags },
+    { name: '模型管理', href: '/models', icon: Box },
     { name: '设置', href: '/settings', icon: Settings },
   ];
 

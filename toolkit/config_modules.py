@@ -1,4 +1,4 @@
-﻿import os
+import os
 import time
 from typing import List, Optional, Literal, Tuple, Union, TYPE_CHECKING, Dict
 import random
@@ -212,6 +212,9 @@ class NetworkConfig:
         # ramtorch, doesn't work yet
         self.layer_offloading = kwargs.get('layer_offloading', False)
 
+        # pretrained LoRA path for continued training
+        self.pretrained_lora_path: Optional[str] = kwargs.get('pretrained_lora_path', None)
+
 
 AdapterTypes = Literal['t2i', 'ip', 'ip+', 'clip', 'ilora', 'photo_maker', 'control_net', 'control_lora', 'i2v']
 
@@ -401,6 +404,12 @@ class TrainConfig:
         self.num_train_timesteps = kwargs.get('num_train_timesteps', 1000)
         # automatically adapte the vae scaling based on the image norm
         self.adaptive_scaling_factor = kwargs.get('adaptive_scaling_factor', False)
+        self.do_signal_correction_noise: bool = kwargs.get('do_signal_correction_noise', False)
+        self.signal_correction_noise_scale: float = kwargs.get('signal_correction_noise_scale', 1.0)
+        self.do_batch_noise_correction: bool = kwargs.get('do_batch_noise_correction', False)
+        self.batch_noise_correction_scale: float = kwargs.get('batch_noise_correction_scale', 1.0)
+        self.do_blank_stabilization: bool = kwargs.get('do_blank_stabilization', False)
+        self.merge_network_on_save_strength: float = kwargs.get('merge_network_on_save_strength', 1.0)
 
         # dropout that happens before encoding. It functions independently per text encoder
         self.prompt_dropout_prob = kwargs.get('prompt_dropout_prob', 0.0)

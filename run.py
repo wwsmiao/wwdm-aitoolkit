@@ -100,7 +100,8 @@ def main():
             print_acc(f"Error running job: {e}")
             jobs_failed += 1
             try:
-                job.process[0].on_error(e)
+                if 'job' in locals() and hasattr(job, 'process') and len(job.process) > 0:
+                    job.process[0].on_error(e)
             except Exception as e2:
                 print_acc(f"Error running on_error: {e2}")
             if not args.recover:
@@ -108,7 +109,8 @@ def main():
                 raise e
         except KeyboardInterrupt as e:
             try:
-                job.process[0].on_error(e)
+                if 'job' in locals() and hasattr(job, 'process') and len(job.process) > 0:
+                    job.process[0].on_error(e)
             except Exception as e2:
                 print_acc(f"Error running on_error: {e2}")
             if not args.recover:

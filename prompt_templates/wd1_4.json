@@ -1,0 +1,5 @@
+{
+  "name": "wd1.4英文词语标签",
+  "description": "wd1.4英文词语标签",
+  "prompt": "请使用wd1.4格式的英文词语标签来描述图片，只输出标签，标签开头必须使用{chufaci},参考这个标签格式输出：{chufaci}, 1girl, solo, looking at viewer, smile,"
+}

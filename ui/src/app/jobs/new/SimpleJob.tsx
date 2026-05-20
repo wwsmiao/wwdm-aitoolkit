@@ -366,7 +366,7 @@ export default function SimpleJob({
                   label="线性秩 (Linear Rank)"
                   value={jobConfig.config.process[0].network.linear}
                   onChange={value => {
-                    console.log('onChange', value);
+                    // debug: console.log('onChange', value);
                     setJobConfig(value, 'config.process[0].network.linear');
                     setJobConfig(value, 'config.process[0].network.linear_alpha');
                   }}
@@ -380,7 +380,7 @@ export default function SimpleJob({
                     label="卷积秩 (Conv Rank)"
                     value={jobConfig.config.process[0].network.conv}
                     onChange={value => {
-                      console.log('onChange', value);
+                      // debug: console.log('onChange', value);
                       setJobConfig(value, 'config.process[0].network.conv');
                       setJobConfig(value, 'config.process[0].network.conv_alpha');
                     }}

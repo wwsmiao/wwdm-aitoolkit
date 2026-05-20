@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { getDatasetsRoot, getTrainingFolder, getDataRoot } from '@/server/settings';
 
-export async function GET(request: NextRequest, { params }: { params: { imagePath: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ imagePath: string }> }) {
   const { imagePath } = await params;
   try {
     // Decode the path

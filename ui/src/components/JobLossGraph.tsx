@@ -1,7 +1,7 @@
 'use client';
 
 import { Job } from '@prisma/client';
-import useJobLossLog, { LossPoint } from '@/hooks/useJobLossLog';
+import useJobLossLog, { LossPoint, LossStats } from '@/hooks/useJobLossLog';
 import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import uPlot from 'uplot';
 import 'uplot/dist/uPlot.min.css';
@@ -89,7 +89,7 @@ function ToggleButton({ checked, onClick, label }: { checked: boolean; onClick: 
 }
 
 export default function JobLossGraph({ job }: Props) {
-  const { series, lossKeys, status, refreshLoss } = useJobLossLog(job.id, 2000);
+  const { series, lossKeys, status, refreshLoss, hasLr, stats } = useJobLossLog(job.id, 2000);
 
   const [useLogScale, setUseLogScale] = useState(false);
   const [showRaw, setShowRaw] = useState(false);
@@ -298,7 +298,7 @@ export default function JobLossGraph({ job }: Props) {
         <div className="bg-gray-950 rounded-lg border border-gray-800 relative select-none flex-1 min-h-0" style={{ minHeight: 240 }}>
           {!hasData ? (
             <div className="absolute inset-0 flex items-center justify-center text-sm text-gray-400">
-              {status === 'error' ? 'Failed to load loss logs.' : 'Waiting for loss points...'}
+              {status === 'error' ? 'Failed to load loss logs.' : status === 'loading' ? 'Loading loss data...' : 'Training has not started yet. Loss data will appear here once training begins.'}
             </div>
           ) : (
             <>
