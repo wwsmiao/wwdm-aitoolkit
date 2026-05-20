@@ -15,54 +15,32 @@ function parseMetrics(log: string): MetricsPoint[] {
   const points: MetricsPoint[] = [];
   const lines = log.split('\n');
 
-  // Try multiple regex patterns for different training log formats
-  const patterns = [
-    // tqdm progress bar: 1000/1000 [time, it/s, lr: X, loss: Y]
-    /(\d+)\/\d+[^,]+,\s*loss:\s*([\d.]+(?:e[+-]?\d+)?)/i,
-    // Step: NNN, Loss: X.XXXX, ...
-    /[Ss]tep:\s*(\d+)[,\s]+[Ll]oss:\s*([\d.]+(?:e[+-]?\d+)?)/,
-    // loss: X.XXXX @ step NNN
-    /[Ll]oss:\s*([\d.]+(?:e[+-]?\d+)?)[,\s]+[Ss]tep:\s*(\d+)/i,
-    // | step NNN | loss X.XXXX |
-    /\|.*step\s*(\d+).*\|.*loss\s*([\d.]+(?:e[+-]?\d+)?).*\|/i,
-    // epoch NNN - step NNN - loss: X.XXXX
-    /epoch\s*\d+[^\n]*?[Ss]tep\s*(\d+)[^\n]*?[Ll]oss[\s:]*(\S+)/i,
+  // Each pattern is [regex, stepCaptureIndex, lossCaptureIndex]
+  // capture indices are 1-based (1st capture group = 1, 2nd = 2)
+  type PatternDef = [RegExp, number, number];
+  const patterns: PatternDef[] = [
+    // tqdm: 1000/1000 [time, it/s, lr: X, loss: Y]  — match[1]=step, match[2]=loss
+    [/(\d+)\/\d+\s+\[[^\]]*loss[=:]\s*([\d.]+(?:e[+-]?\d+)?)\]/i, 1, 2],
+    // Step: NNN, Loss: X.XXXX  — match[1]=step, match[2]=loss
+    [/step:\s*(\d+)[,\s]+loss:\s*([\d.]+(?:e[+-]?\d+)?)/i, 1, 2],
+    // Loss: X.XXXX, Step: NNN  — match[1]=loss, match[2]=step
+    [/loss:\s*([\d.]+(?:e[+-]?\d+)?)[,\s]+step:\s*(\d+)/i, 2, 1],
+    // | step NNN | loss X.XXXX |  — match[1]=step, match[2]=loss
+    [/\|.*step\s*(\d+).*\|.*loss\s*([\d.]+(?:e[+-]?\d+)?).*\|/i, 1, 2],
+    // epoch N - step NNN - loss: X.XXXX  — match[1]=step, match[2]=loss
+    [/epoch\s*\d+[^\n]*?step\s*(\d+)[^\n]*?loss[\s:]*(\S+)/i, 1, 2],
   ];
 
   for (const line of lines) {
-    for (const pattern of patterns) {
-      const match = line.match(pattern);
+    for (const [regex, stepIdx, lossIdx] of patterns) {
+      const match = line.match(regex);
       if (match) {
-        // Figure out which group is step and which is loss based on pattern
-        let stepStr: string, lossStr: string;
-        if (pattern.toString().includes('[Ss]tep:[\\s:]*([\\d.]+(?:e[+-]?\\d+)?)')) {
-          stepStr = match[1];
-          lossStr = match[2];
-        } else if (pattern.toString().includes('[Ss]tep\\s*(\\d+)')) {
-          stepStr = match[1];
-          lossStr = match[2];
-        } else {
-          stepStr = match[1];
-          lossStr = match[2];
+        const step = parseInt(match[stepIdx], 10);
+        const loss = parseFloat(match[lossIdx]);
+        if (!isNaN(step) && !isNaN(loss) && step > 0 && Number.isFinite(loss)) {
+          points.push({ step, loss });
         }
-        // For patterns where step is the first capture group
-        if (match[1] && match[2]) {
-          // Detect: first is step, second is loss (numeric check)
-          const a = parseFloat(match[1]);
-          const b = parseFloat(match[2]);
-          let step: number, loss: number;
-          if (a > 10 && b < 100) {
-            step = a; loss = b;
-          } else if (b > 10 && a < 100) {
-            step = b; loss = a;
-          } else {
-            step = a; loss = b;
-          }
-          if (!isNaN(step) && !isNaN(loss) && step > 0) {
-            points.push({ step, loss });
-          }
-        }
-        break; // first matching pattern wins
+        break; // first matching pattern wins per line
       }
     }
   }
